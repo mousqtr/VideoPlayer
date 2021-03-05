@@ -1,0 +1,10 @@
+html, body {
+    height:100%;
+}
+
+#divActivity {
+    width: 50%;
+    height: 50%;
+    padding:0;
+    margin:0;
+}
