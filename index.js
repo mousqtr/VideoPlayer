@@ -10,6 +10,7 @@ const divActivity = document.getElementById('divActivity');
 let div1 = document.createElement('div');
 div1.style.width = "100%";
 div1.style.height = "10%";
+div1.style.float = "left";
 
 let urlInput = document.createElement('input');
 urlInput.id = "inputUrlVideo";
@@ -37,20 +38,105 @@ goVideoButton.onclick = function () {
 let div2 = document.createElement('div');
 div2.id = 'divPlayer'
 div2.style.width = "100%";
-div2.style.height = "90%";
+div2.style.height = "80%";
+div2.style.float = "left"
+
+let div3 = document.createElement('div');
+div3.id = 'divProgressBar';
+div3.style.width = "100%";
+div3.style.height = "8px";
+div3.style.backgroundColor = "grey";
+div3.style.float = "left";
+
+let progressBar = document.createElement('progress');
+progressBar.id = 'progressBar'
+progressBar.style.width = "100%";
+progressBar.style.height = "100%";
+progressBar.value = "0.5";
+progressBar.max = "1";
+progressBar.style.backgroundColor = "green";
+progressBar.style.float = "left"
+
+let div4 = document.createElement('div');
+div4.id = 'divControls'
+div4.style.width = "100%";
+div4.style.height = "8%";
+div4.style.backgroundColor = "#565656";
+div4.style.float = "left";
+
+let playButton = document.createElement('input');
+playButton.style.width = "10%";
+playButton.style.height = "100%";
+playButton.style.float = "left";
+playButton.type = "image";
+playButton.src = "play.png";
+var play = false;
+playButton.onclick = function () {
+    if (play == false) {
+        console.log("Play video");
+        player.playVideo();
+        playButton.src = "pause.png";
+        play = true;
+    } else {
+        console.log("Pause video");
+        player.pauseVideo();
+        playButton.src = "play.png";
+        play = false;
+    }
+
+}
+
+let timeDisplay = document.createElement('button');
+timeDisplay.style.width = "30%";
+timeDisplay.style.height = "100%";
+timeDisplay.style.float = "left";
+timeDisplay.innerHTML = "00:00:00 / 00:00:00 ";
+timeDisplay.style.backgroundColor = "orange";
+
+let settingsButton = document.createElement('input');
+settingsButton.style.width = "10%";
+settingsButton.style.height = "100%";
+settingsButton.style.float = "right";
+settingsButton.type = "image";
+settingsButton.src = "settings.png";
+settingsButton.onclick = function () {
+    console.log("Setting button");
+}
+
+let volumeButton = document.createElement('input');
+volumeButton.style.width = "10%";
+volumeButton.style.height = "100%";
+volumeButton.style.float = "right";
+volumeButton.type = "image";
+volumeButton.src = "volume.png";
+volumeButton.onclick = function () {
+    console.log("Volume button");
+}
 
 divActivity.appendChild(div1);
+divActivity.appendChild(div2);
+divActivity.appendChild(div3);
+divActivity.appendChild(div4);
+
 div1.appendChild(urlInput);
 div1.appendChild(goVideoButton);
+div3.appendChild(progressBar);
+div4.appendChild(playButton);
+div4.appendChild(timeDisplay);
+div4.appendChild(volumeButton);
+div4.appendChild(settingsButton);
 
-divActivity.appendChild(div2);
 
 var player;
 function onYouTubeIframeAPIReady() {
     player = new YT.Player('divPlayer', {
         height: '100%',
         width: '100%',
-        videoId: '',
+        videoId: 'BtyHYIpykN0',
+        playerVars: { 
+        'controls': 0,
+        'disablekb' : 1
+        },
         events: {
         'onReady': onPlayerReady,
         'onStateChange': onPlayerStateChange
@@ -61,33 +147,34 @@ function onYouTubeIframeAPIReady() {
 function onPlayerReady(event) {
    console.log("Video ready");
 
-   let videoUrl = urlVideo.value;
-   let videoId = youtube_parser(videoUrl);
-   player.loadVideoById(videoId);
+//    let videoUrl = urlVideo.value;
+//    let videoId = youtube_parser(videoUrl);
+//    player.loadVideoById(videoId);
    player.pauseVideo();
 }
+
 
 function onPlayerStateChange(event) {
     if (event.data == YT.PlayerState.PLAYING) {
         console.log("Play at : ", player.getCurrentTime());
+        player.pauseVideo();
+
     }
 
     if (event.data == YT.PlayerState.PAUSED) {
         console.log("Pause at : ", player.getCurrentTime());
+        player.playVideo();
     }
 
-    if (event.data == YT.PlayerState.ENDED) {
-        console.log("Video finished");
-    }
 }
 
 
 
-const seekTo = document.getElementById('seekTo');
-seekTo.addEventListener('click', function () {  
-    player.seekTo(50, true);
-    player.playVideo();
-});
+// const seekTo = document.getElementById('seekTo');
+// seekTo.addEventListener('click', function () {  
+//     player.seekTo(50, true);
+//     player.playVideo();
+// });
 
 
 
