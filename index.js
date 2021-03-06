@@ -97,7 +97,8 @@ let timeDisplay = document.createElement('button');
 timeDisplay.style.width = "30%";
 timeDisplay.style.height = "100%";
 timeDisplay.style.float = "left";
-timeDisplay.innerHTML = "00:00:00 / 00:00:00 ";
+timeDisplay.innerHTML = "00:00:00/00:00:00 ";
+timeDisplay.style.fontSize = "2vh";
 timeDisplay.style.backgroundColor = "orange";
 
 let settingsButton = document.createElement('input');
@@ -159,6 +160,42 @@ function onPlayerReady(event) {
 //    player.loadVideoById(videoId);
    player.pauseVideo();
 }
+
+setInterval(function() {
+    let time = player.getCurrentTime();
+    let timeTotal = player.getDuration();
+
+    // Update progress bar
+    progressBar.value = time / timeTotal;
+
+    // Update time display
+    timeDisplay.innerHTML = changeFormatTime(time) + "/" + changeFormatTime(timeTotal);
+
+}, 1000)
+
+function changeFormatTime(time) {
+    time = Math.round(time);
+    let minutes = Math.floor(time / 60);
+    let seconds = time - minutes * 60;
+    minutes = minutes < 10 ? '0' + minutes : minutes;
+    seconds = seconds < 10 ? '0' + seconds : seconds;
+    return minutes + ":" + seconds;
+}
+
+// progressBar.addEventListener('mousedown', event => {
+//     var newTime = player.getDuration() * (event.target.value / 100);
+//     player.seekTo(newTime);
+// });
+
+progressBar.addEventListener('click', function (event) {
+    let x = event.pageX - this.offsetLeft; // or e.offsetX (less support, though)
+    let clickedValue = x * this.max / this.offsetWidth;
+
+    let newTime = player.getDuration() * clickedValue;
+    player.seekTo(newTime);
+
+    console.log(clickedValue);
+});
 
 var done = true;
 function onPlayerStateChange(event) {
