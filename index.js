@@ -71,18 +71,25 @@ playButton.style.float = "left";
 playButton.type = "image";
 playButton.src = "play.png";
 var play = false;
+var actionInProgress = false
 playButton.onclick = function () {
     if (play == false) {
         console.log("Play video");
         player.playVideo();
         playButton.src = "pause.png";
         play = true;
+        actionInProgress = true;
     } else {
         console.log("Pause video");
         player.pauseVideo();
         playButton.src = "play.png";
         play = false;
+        actionInProgress = true;
     }
+
+    setTimeout(function(){
+        actionInProgress = false;
+    }, 1000);
 
 }
 
@@ -153,18 +160,26 @@ function onPlayerReady(event) {
    player.pauseVideo();
 }
 
-
+var done = true;
 function onPlayerStateChange(event) {
-    if (event.data == YT.PlayerState.PLAYING) {
-        console.log("Play at : ", player.getCurrentTime());
-        player.pauseVideo();
-
-    }
-
-    if (event.data == YT.PlayerState.PAUSED) {
-        console.log("Pause at : ", player.getCurrentTime());
-        player.playVideo();
-    }
+    if (actionInProgress == false) {
+        if (event.data == YT.PlayerState.PLAYING && done == true) {
+            console.log("Play at : ", player.getCurrentTime());
+            player.pauseVideo();
+            done = false;
+    
+        }
+    
+        if (event.data == YT.PlayerState.PAUSED  && done == true) {
+            console.log("Pause at : ", player.getCurrentTime());
+            player.playVideo();
+            done = false;
+        }
+    
+        setTimeout(function(){
+            done = true;
+        }, 1000);
+    }  
 
 }
 
