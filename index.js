@@ -71,25 +71,28 @@ playButton.style.float = "left";
 playButton.type = "image";
 playButton.src = "play.png";
 var play = false;
-var actionInProgress = false
+var playBool = false;
+var pauseBool = false;
+
 playButton.onclick = function () {
     if (play == false) {
         console.log("Play video");
         player.playVideo();
         playButton.src = "pause.png";
         play = true;
-        actionInProgress = true;
+        playBool = true;
     } else {
         console.log("Pause video");
         player.pauseVideo();
         playButton.src = "play.png";
         play = false;
-        actionInProgress = true;
+        pauseBool = true;
     }
 
-    setTimeout(function(){
-        actionInProgress = false;
-    }, 1000);
+    // setTimeout(function(){
+    //     console.log('settimeout')
+    //     actionInProgress = false;
+    // }, 5000);
 
 }
 
@@ -152,25 +155,27 @@ function onYouTubeIframeAPIReady() {
     });
 }
 
+var playerReady = false;
 function onPlayerReady(event) {
    console.log("Video ready");
-
+   playerReady = true;
 //    let videoUrl = urlVideo.value;
 //    let videoId = youtube_parser(videoUrl);
 //    player.loadVideoById(videoId);
-   player.pauseVideo();
+//    player.pauseVideo();
 }
 
 setInterval(function() {
-    let time = player.getCurrentTime();
-    let timeTotal = player.getDuration();
-
-    // Update progress bar
-    progressBar.value = time / timeTotal;
-
-    // Update time display
-    timeDisplay.innerHTML = changeFormatTime(time) + "/" + changeFormatTime(timeTotal);
-
+    if (playerReady) {
+        let time = player.getCurrentTime();
+        let timeTotal = player.getDuration();
+    
+        // Update progress bar
+        progressBar.value = time / timeTotal;
+    
+        // Update time display
+        timeDisplay.innerHTML = changeFormatTime(time) + "/" + changeFormatTime(timeTotal);       
+    }
 }, 1000)
 
 function changeFormatTime(time) {
@@ -199,24 +204,26 @@ progressBar.addEventListener('click', function (event) {
 
 var done = true;
 function onPlayerStateChange(event) {
-    if (actionInProgress == false) {
-        if (event.data == YT.PlayerState.PLAYING && done == true) {
-            console.log("Play at : ", player.getCurrentTime());
-            player.pauseVideo();
-            done = false;
+
+    if (playBool == true) {
+        playBool = false;
+    } else if (event.data == YT.PlayerState.PLAYING && done == true) {
+        console.log("Play at : ", player.getCurrentTime());
+        player.pauseVideo();
+        done = false;
+    } else if (pauseBool == true) {
+        pauseBool = false;
+    } else if (event.data == YT.PlayerState.PAUSED  && done == true) {
+        console.log("Pause at : ", player.getCurrentTime());
+        player.playVideo();
+        done = false;
+    }
+    // done = true;
+
+    setTimeout(function(){
+        done = true;
+    }, 1000);
     
-        }
-    
-        if (event.data == YT.PlayerState.PAUSED  && done == true) {
-            console.log("Pause at : ", player.getCurrentTime());
-            player.playVideo();
-            done = false;
-        }
-    
-        setTimeout(function(){
-            done = true;
-        }, 1000);
-    }  
 
 }
 
