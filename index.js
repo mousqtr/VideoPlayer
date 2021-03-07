@@ -10,7 +10,7 @@ const divActivity = document.getElementById('divActivity');
 let divChangeUrl = document.createElement('div');
 divChangeUrl.style.width = "100%";
 divChangeUrl.style.height = "10%";
-divChangeUrl.style.float = "left";
+divChangeUrl.style.float = "right";
 
 let urlInput = document.createElement('input');
 urlInput.id = "inputUrlVideo";
@@ -46,7 +46,7 @@ let divVideo = document.createElement('div');
 divVideo.id = 'divVideo'
 divVideo.style.width = "100%";
 divVideo.style.height = "90%";
-divVideo.style.float = "left"
+divVideo.style.float = "left";
 divVideo.style.pointerEvents = "none";
 
 let divProgressBar = document.createElement('div');
@@ -137,7 +137,9 @@ volumeButton.onclick = function () {
     volumeButton.blur();
 }
 
+var fullscreen = false;
 let fullscreenButton = document.createElement('input');
+fullscreenButton.id = "fullscreenButton";
 fullscreenButton.style.width = "10%";
 fullscreenButton.style.height = "100%";
 fullscreenButton.style.float = "right";
@@ -147,17 +149,69 @@ fullscreenButton.onclick = function () {
     console.log("Fullscreen button");
     fullscreenButton.blur();
 
-    var elem = document.getElementById("divPlayer");
-    
-    if (elem.requestFullscreen) {
-        elem.requestFullscreen();
-    } else if (elem.webkitRequestFullscreen) { /* Safari */
-        elem.webkitRequestFullscreen();
-    } else if (elem.msRequestFullscreen) { /* IE11 */
-        elem.msRequestFullscreen();
-    }
-    
+    var isInFullScreen = (document.fullscreenElement && document.fullscreenElement !== null) ||
+        (document.webkitFullscreenElement && document.webkitFullscreenElement !== null) ||
+        (document.mozFullScreenElement && document.mozFullScreenElement !== null) ||
+        (document.msFullscreenElement && document.msFullscreenElement !== null);
+
+    let divPlayer = document.getElementById("divPlayer");
+    let divVideo = document.getElementById("divVideo");
+    let divControls = document.getElementById("divControls");
+
+    if (!isInFullScreen) {
+
+        fullscreenButton.src = "miniscreen.png";
+        divVideo.style.height = "93%";
+        divControls.style.height = "5%";
+        fullscreen = true;
+
+        if (divPlayer.requestFullscreen) {
+            divPlayer.requestFullscreen();
+        } else if (divPlayer.mozRequestFullScreen) {
+            divPlayer.mozRequestFullScreen();
+        } else if (divPlayer.webkitRequestFullScreen) {
+            divPlayer.webkitRequestFullScreen();
+        } else if (divPlayer.msRequestFullscreen) {
+            divPlayer.msRequestFullscreen();
+        }
+
+    } else {
+
+        fullscreenButton.src = "fullscreen.png";
+        divControls.style.height = "10%";
+        divVideo.style.height = "90%";
+        fullscreen = false;
+
+        if (document.exitFullscreen) {
+            document.exitFullscreen();
+        } else if (document.webkitExitFullscreen) {
+            document.webkitExitFullscreen();
+        } else if (document.mozCancelFullScreen) {
+            document.mozCancelFullScreen();
+        } else if (document.msExitFullscreen) {
+            document.msExitFullscreen();
+        }
+    }   
 }
+
+// Change sizes if fullscreen or not
+document.onfullscreenchange = function ( event ) {
+    if (fullscreen == false) {
+
+        console.log("ok")
+        let divVideo = document.getElementById("divVideo");
+        let divControls = document.getElementById("divControls");
+        let fullscreenButton = document.getElementById("fullscreenButton");
+
+        fullscreenButton.src = "fullscreen.png";
+        divControls.style.height = "10%";
+        divVideo.style.height = "90%";
+
+        fullscreen = false;
+    }
+
+}
+
 
 divActivity.appendChild(divChangeUrl);
 divActivity.appendChild(divPlayer);
@@ -182,25 +236,19 @@ function onYouTubeIframeAPIReady() {
     player = new YT.Player('divVideo', {
         height: '100%',
         width: '100%',
-        videoId: 'BtyHYIpykN0',
+        videoId: 'lf_53JgPXr8',
         playerVars: { 
-        'controls': 0,
-        'disablekb' : 1
+            'controls': 0,
+            'disablekb' : 1,
+            'rel' : 0,
+            'showinfo': 0
         },
         events: {
-        'onReady': onPlayerReady,
+            'onReady': onPlayerReady,
         // 'onStateChange': onPlayerStateChange
         }
     });
 
-    // player.addEventListener('onStateChange', function(event) {
-    //     console.log("onStateChange");
-    //     onPlayerStateChange(event);
-    // });
-
-    // player.addEventListener('onStateChange', function(event) {
-    //     onPlayerStateChange(event)
-    // });
 }
 
 
@@ -210,10 +258,6 @@ var playerReady = false;
 function onPlayerReady(event) {
    console.log("Video ready");
    playerReady = true;
-//    let videoUrl = urlVideo.value;
-//    let videoId = youtube_parser(videoUrl);
-//    player.loadVideoById(videoId);
-//    player.pauseVideo();
 }
 
 setInterval(function() {
@@ -230,19 +274,18 @@ setInterval(function() {
     }
 }, 1000)
 
+// Function that change time format (N seconds to 00:00:00)
 function changeFormatTime(time) {
     time = Math.round(time);
-    let minutes = Math.floor(time / 60);
-    let seconds = time - minutes * 60;
+    let hours = Math.floor(time / 3600);
+    let minutes = Math.floor((time - hours * 3600)/60);
+    let seconds = time - minutes * 60 - hours * 3600;
+    hours = hours < 10 ? '0' + hours : hours;
     minutes = minutes < 10 ? '0' + minutes : minutes;
     seconds = seconds < 10 ? '0' + seconds : seconds;
-    return minutes + ":" + seconds;
+    return hours + ":" + minutes + ":" + seconds;
 }
 
-// progressBar.addEventListener('mousedown', event => {
-//     var newTime = player.getDuration() * (event.target.value / 100);
-//     player.seekTo(newTime);
-// });
 
 progressBar.addEventListener('click', function (event) {
     let x = event.pageX - this.offsetLeft; // or e.offsetX (less support, though)
