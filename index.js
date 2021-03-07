@@ -7,10 +7,10 @@ firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
 
 const divActivity = document.getElementById('divActivity');
 
-let div1 = document.createElement('div');
-div1.style.width = "100%";
-div1.style.height = "10%";
-div1.style.float = "left";
+let divChangeUrl = document.createElement('div');
+divChangeUrl.style.width = "100%";
+divChangeUrl.style.height = "10%";
+divChangeUrl.style.float = "left";
 
 let urlInput = document.createElement('input');
 urlInput.id = "inputUrlVideo";
@@ -35,34 +35,42 @@ goVideoButton.onclick = function () {
     player.pauseVideo();
 }
 
-let div2 = document.createElement('div');
-div2.id = 'divPlayer'
-div2.style.width = "100%";
-div2.style.height = "80%";
-div2.style.float = "left"
+let divPlayer = document.createElement('div');
+divPlayer.id = 'divPlayer'
+divPlayer.style.width = "100%";
+divPlayer.style.height = "90%";
+divPlayer.style.float = "left";
 
-let div3 = document.createElement('div');
-div3.id = 'divProgressBar';
-div3.style.width = "100%";
-div3.style.height = "8px";
-div3.style.backgroundColor = "grey";
-div3.style.float = "left";
+
+let divVideo = document.createElement('div');
+divVideo.id = 'divVideo'
+divVideo.style.width = "100%";
+divVideo.style.height = "90%";
+divVideo.style.float = "left"
+divVideo.style.pointerEvents = "none";
+
+let divProgressBar = document.createElement('div');
+divProgressBar.id = 'divProgressBar';
+divProgressBar.style.width = "100%";
+divProgressBar.style.height = "2%";
+divProgressBar.style.backgroundColor = "grey";
+divProgressBar.style.float = "left";
 
 let progressBar = document.createElement('progress');
 progressBar.id = 'progressBar'
 progressBar.style.width = "100%";
 progressBar.style.height = "100%";
-progressBar.value = "0.5";
+progressBar.value = "0";
 progressBar.max = "1";
 progressBar.style.backgroundColor = "green";
 progressBar.style.float = "left"
 
-let div4 = document.createElement('div');
-div4.id = 'divControls'
-div4.style.width = "100%";
-div4.style.height = "8%";
-div4.style.backgroundColor = "#565656";
-div4.style.float = "left";
+let divControls = document.createElement('div');
+divControls.id = 'divControls'
+divControls.style.width = "100%";
+divControls.style.height = "10%";
+divControls.style.backgroundColor = "#262626";
+divControls.style.float = "left";
 
 let playButton = document.createElement('input');
 playButton.style.width = "10%";
@@ -75,6 +83,7 @@ var playBool = false;
 var pauseBool = false;
 
 playButton.onclick = function () {
+
     if (play == false) {
         console.log("Play video");
         player.playVideo();
@@ -88,21 +97,23 @@ playButton.onclick = function () {
         play = false;
         pauseBool = true;
     }
-
-    // setTimeout(function(){
-    //     console.log('settimeout')
-    //     actionInProgress = false;
-    // }, 5000);
-
+    playButton.blur();
 }
+
+
+
 
 let timeDisplay = document.createElement('button');
 timeDisplay.style.width = "30%";
 timeDisplay.style.height = "100%";
 timeDisplay.style.float = "left";
+timeDisplay.style.border = "0";
+timeDisplay.style.fontWeight = "bold";
 timeDisplay.innerHTML = "00:00:00/00:00:00 ";
 timeDisplay.style.fontSize = "2vh";
-timeDisplay.style.backgroundColor = "orange";
+timeDisplay.style.backgroundColor = "#262626";
+timeDisplay.style.color = "white"
+
 
 let settingsButton = document.createElement('input');
 settingsButton.style.width = "10%";
@@ -112,6 +123,7 @@ settingsButton.type = "image";
 settingsButton.src = "settings.png";
 settingsButton.onclick = function () {
     console.log("Setting button");
+    settingsButton.blur();
 }
 
 let volumeButton = document.createElement('input');
@@ -122,25 +134,52 @@ volumeButton.type = "image";
 volumeButton.src = "volume.png";
 volumeButton.onclick = function () {
     console.log("Volume button");
+    volumeButton.blur();
 }
 
-divActivity.appendChild(div1);
-divActivity.appendChild(div2);
-divActivity.appendChild(div3);
-divActivity.appendChild(div4);
+let fullscreenButton = document.createElement('input');
+fullscreenButton.style.width = "10%";
+fullscreenButton.style.height = "100%";
+fullscreenButton.style.float = "right";
+fullscreenButton.type = "image";
+fullscreenButton.src = "fullscreen.png";
+fullscreenButton.onclick = function () {
+    console.log("Fullscreen button");
+    fullscreenButton.blur();
 
-div1.appendChild(urlInput);
-div1.appendChild(goVideoButton);
-div3.appendChild(progressBar);
-div4.appendChild(playButton);
-div4.appendChild(timeDisplay);
-div4.appendChild(volumeButton);
-div4.appendChild(settingsButton);
+    var elem = document.getElementById("divPlayer");
+    
+    if (elem.requestFullscreen) {
+        elem.requestFullscreen();
+    } else if (elem.webkitRequestFullscreen) { /* Safari */
+        elem.webkitRequestFullscreen();
+    } else if (elem.msRequestFullscreen) { /* IE11 */
+        elem.msRequestFullscreen();
+    }
+    
+}
+
+divActivity.appendChild(divChangeUrl);
+divActivity.appendChild(divPlayer);
+divPlayer.appendChild(divVideo);
+divPlayer.appendChild(divProgressBar);
+divPlayer.appendChild(divControls);
+
+divChangeUrl.appendChild(urlInput);
+divChangeUrl.appendChild(goVideoButton);
+
+divProgressBar.appendChild(progressBar);
+
+divControls.appendChild(playButton);
+divControls.appendChild(timeDisplay);
+divControls.appendChild(fullscreenButton);
+divControls.appendChild(volumeButton);
+divControls.appendChild(settingsButton);
 
 
 var player;
 function onYouTubeIframeAPIReady() {
-    player = new YT.Player('divPlayer', {
+    player = new YT.Player('divVideo', {
         height: '100%',
         width: '100%',
         videoId: 'BtyHYIpykN0',
@@ -150,10 +189,22 @@ function onYouTubeIframeAPIReady() {
         },
         events: {
         'onReady': onPlayerReady,
-        'onStateChange': onPlayerStateChange
+        // 'onStateChange': onPlayerStateChange
         }
     });
+
+    // player.addEventListener('onStateChange', function(event) {
+    //     console.log("onStateChange");
+    //     onPlayerStateChange(event);
+    // });
+
+    // player.addEventListener('onStateChange', function(event) {
+    //     onPlayerStateChange(event)
+    // });
 }
+
+
+
 
 var playerReady = false;
 function onPlayerReady(event) {
@@ -166,6 +217,7 @@ function onPlayerReady(event) {
 }
 
 setInterval(function() {
+    
     if (playerReady) {
         let time = player.getCurrentTime();
         let timeTotal = player.getDuration();
@@ -199,20 +251,21 @@ progressBar.addEventListener('click', function (event) {
     let newTime = player.getDuration() * clickedValue;
     player.seekTo(newTime);
 
+    if(play){
+        player.playVideo();
+    } else {
+        player.pauseVideo();
+    }
+
     console.log(clickedValue);
 });
 
 var done = true;
 function onPlayerStateChange(event) {
-
-    if (playBool == true) {
-        playBool = false;
-    } else if (event.data == YT.PlayerState.PLAYING && done == true) {
+    if (event.data == YT.PlayerState.PLAYING && done == true) {
         console.log("Play at : ", player.getCurrentTime());
         player.pauseVideo();
         done = false;
-    } else if (pauseBool == true) {
-        pauseBool = false;
     } else if (event.data == YT.PlayerState.PAUSED  && done == true) {
         console.log("Pause at : ", player.getCurrentTime());
         player.playVideo();
@@ -222,7 +275,7 @@ function onPlayerStateChange(event) {
 
     setTimeout(function(){
         done = true;
-    }, 1000);
+    }, 500);
     
 
 }
