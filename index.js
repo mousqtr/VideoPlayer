@@ -115,17 +115,140 @@ timeDisplay.style.backgroundColor = "#262626";
 timeDisplay.style.color = "white"
 
 
+
 let settingsButton = document.createElement('input');
 settingsButton.style.width = "10%";
 settingsButton.style.height = "100%";
 settingsButton.style.float = "right";
 settingsButton.type = "image";
 settingsButton.src = "settings.png";
+
+
+divActivity.style.position = "relative";
+
+let divSetting = document.createElement('div');
+divSetting.style.width = "40%";
+divSetting.style.height = "40%";
+divSetting.style.position = "absolute";
+divSetting.style.top = "30%";
+divSetting.style.left = "30%";
+divSetting.style.backgroundColor = "black";
+divSetting.style.opacity = "0.77";
+divSetting.style.display = "none";
+
+var divSettingShow = false;
 settingsButton.onclick = function () {
     console.log("Setting button");
     settingsButton.blur();
+
+    if (divSettingShow == false) {
+        divSetting.style.display = "block";
+        divSettingShow = true;
+    } else {
+        divSetting.style.display = "none";
+        divSettingShow = false;
+    }
 }
 
+
+
+
+
+// Quality section
+let divQuality = document.createElement('div');
+divQuality.style.width = "100%";
+divQuality.style.height = "30px";
+divSetting.appendChild(divQuality);
+
+let textQuality = document.createElement('div');
+textQuality.style.width = "50%";
+textQuality.style.height = "100%";
+textQuality.innerHTML = "Quality"
+textQuality.style.fontWeight = "bold";
+textQuality.style.fontFamily = "Arial";
+textQuality.style.color = "white";
+textQuality.style.float = "left";
+textQuality.style.display = "flex";
+textQuality.style.justifyContent = "center";
+textQuality.style.alignItems = "center";
+divQuality.appendChild(textQuality);
+
+let selectQuality = document.createElement('select');
+selectQuality.style.width = "40%";
+selectQuality.style.height = "80%";
+selectQuality.style.float = "right";
+selectQuality.style.marginTop = "1.5%";
+selectQuality.style.marginRight = "5%";
+divQuality.appendChild(selectQuality);
+
+let qualities = ["hd1080", "hd720", "large", "medium", "small", "tiny", "auto"];
+let qualityNames = ["1080p", "720p", "480p", "360p", "240p", "144p", "Auto"];
+for (let i = 0; i < qualities.length; i++) {
+    let optionQuality = document.createElement('option');
+    optionQuality.innerText = qualityNames[i];
+    selectQuality.appendChild(optionQuality);
+}
+
+selectQuality.value = "Auto";
+
+selectQuality.addEventListener('change', function(event) {
+    let indexQuality = qualityNames.indexOf(this.value);
+    console.log('You selected: ', qualities[indexQuality]);
+    event.target.player.setPlaybackQuality("small");
+    console.log(player.getPlaybackQuality());
+});
+
+
+
+
+// Speed section
+let divSpeed = document.createElement('div');
+divSpeed.style.width = "100%";
+divSpeed.style.height = "30px";
+divSetting.appendChild(divSpeed);
+
+let textSpeed = document.createElement('div');
+textSpeed.style.width = "50%";
+textSpeed.style.height = "100%";
+textSpeed.innerHTML = "Speed"
+textSpeed.style.fontWeight = "bold";
+textSpeed.style.fontFamily = "Arial";
+textSpeed.style.color = "white";
+textSpeed.style.float = "left";
+textSpeed.style.display = "flex";
+textSpeed.style.justifyContent = "center";
+textSpeed.style.alignItems = "center";
+divSpeed.appendChild(textSpeed);
+
+let selectSpeed = document.createElement('select');
+selectSpeed.style.width = "40%";
+selectSpeed.style.height = "80%";
+selectSpeed.style.float = "right";
+selectSpeed.style.marginTop = "1.5%";
+selectSpeed.style.marginRight = "5%";
+divSpeed.appendChild(selectSpeed);
+
+let speeds = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 2];
+for (let i = 0; i < speeds.length; i++) {
+    let option = document.createElement('option');
+    option.innerText = speeds[i];
+    selectSpeed.appendChild(option);
+}
+
+selectSpeed.value = 1;
+
+selectSpeed.addEventListener('change', function() {
+    console.log('You selected: ', this.value);
+    player.setPlaybackRate(this.value);
+    console.log(player.getPlaybackRate())
+});
+
+
+
+
+
+
+// Volume handle
 let volumeButton = document.createElement('input');
 volumeButton.style.width = "10%";
 volumeButton.style.height = "100%";
@@ -137,6 +260,10 @@ volumeButton.onclick = function () {
     volumeButton.blur();
 }
 
+
+
+
+// Fullscreen handle
 var fullscreen = false;
 let fullscreenButton = document.createElement('input');
 fullscreenButton.id = "fullscreenButton";
@@ -215,6 +342,8 @@ document.onfullscreenchange = function ( event ) {
 
 divActivity.appendChild(divChangeUrl);
 divActivity.appendChild(divPlayer);
+divActivity.appendChild(divSetting);
+
 divPlayer.appendChild(divVideo);
 divPlayer.appendChild(divProgressBar);
 divPlayer.appendChild(divControls);
@@ -231,6 +360,13 @@ divControls.appendChild(volumeButton);
 divControls.appendChild(settingsButton);
 
 
+
+
+
+
+
+
+
 var player;
 function onYouTubeIframeAPIReady() {
     player = new YT.Player('divVideo', {
@@ -244,15 +380,14 @@ function onYouTubeIframeAPIReady() {
             'showinfo': 0
         },
         events: {
-            'onReady': onPlayerReady,
-        // 'onStateChange': onPlayerStateChange
+            'onReady': onPlayerReady
         }
+
     });
 
+    
+
 }
-
-
-
 
 var playerReady = false;
 function onPlayerReady(event) {
@@ -260,6 +395,8 @@ function onPlayerReady(event) {
    playerReady = true;
 }
 
+
+// Update contents (time / progress bar)
 setInterval(function() {
     
     if (playerReady) {
@@ -270,9 +407,12 @@ setInterval(function() {
         progressBar.value = time / timeTotal;
     
         // Update time display
-        timeDisplay.innerHTML = changeFormatTime(time) + "/" + changeFormatTime(timeTotal);       
+        timeDisplay.innerHTML = changeFormatTime(time) + "/" + changeFormatTime(timeTotal);   
+        
+        // console.log(player.getAvailableQualityLevels())
     }
 }, 1000)
+
 
 // Function that change time format (N seconds to 00:00:00)
 function changeFormatTime(time) {
@@ -286,7 +426,7 @@ function changeFormatTime(time) {
     return hours + ":" + minutes + ":" + seconds;
 }
 
-
+// Click on progress bar
 progressBar.addEventListener('click', function (event) {
     let x = event.pageX - this.offsetLeft; // or e.offsetX (less support, though)
     let clickedValue = x * this.max / this.offsetWidth;
@@ -302,34 +442,6 @@ progressBar.addEventListener('click', function (event) {
 
     console.log(clickedValue);
 });
-
-var done = true;
-function onPlayerStateChange(event) {
-    if (event.data == YT.PlayerState.PLAYING && done == true) {
-        console.log("Play at : ", player.getCurrentTime());
-        player.pauseVideo();
-        done = false;
-    } else if (event.data == YT.PlayerState.PAUSED  && done == true) {
-        console.log("Pause at : ", player.getCurrentTime());
-        player.playVideo();
-        done = false;
-    }
-    // done = true;
-
-    setTimeout(function(){
-        done = true;
-    }, 500);
-    
-
-}
-
-
-
-// const seekTo = document.getElementById('seekTo');
-// seekTo.addEventListener('click', function () {  
-//     player.seekTo(50, true);
-//     player.playVideo();
-// });
 
 
 
