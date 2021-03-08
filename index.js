@@ -109,139 +109,10 @@ timeDisplay.style.height = "100%";
 timeDisplay.style.float = "left";
 timeDisplay.style.border = "0";
 timeDisplay.style.fontWeight = "bold";
-timeDisplay.innerHTML = "00:00:00/00:00:00 ";
+timeDisplay.innerHTML = "00:00:00 / 00:00:00 ";
 timeDisplay.style.fontSize = "2vh";
 timeDisplay.style.backgroundColor = "#262626";
 timeDisplay.style.color = "white"
-
-
-
-let settingsButton = document.createElement('input');
-settingsButton.style.width = "10%";
-settingsButton.style.height = "100%";
-settingsButton.style.float = "right";
-settingsButton.type = "image";
-settingsButton.src = "settings.png";
-
-
-divActivity.style.position = "relative";
-
-let divSetting = document.createElement('div');
-divSetting.style.width = "40%";
-divSetting.style.height = "40%";
-divSetting.style.position = "absolute";
-divSetting.style.top = "30%";
-divSetting.style.left = "30%";
-divSetting.style.backgroundColor = "black";
-divSetting.style.opacity = "0.77";
-divSetting.style.display = "none";
-
-var divSettingShow = false;
-settingsButton.onclick = function () {
-    console.log("Setting button");
-    settingsButton.blur();
-
-    if (divSettingShow == false) {
-        divSetting.style.display = "block";
-        divSettingShow = true;
-    } else {
-        divSetting.style.display = "none";
-        divSettingShow = false;
-    }
-}
-
-
-
-
-
-// Quality section
-let divQuality = document.createElement('div');
-divQuality.style.width = "100%";
-divQuality.style.height = "30px";
-divSetting.appendChild(divQuality);
-
-let textQuality = document.createElement('div');
-textQuality.style.width = "50%";
-textQuality.style.height = "100%";
-textQuality.innerHTML = "Quality"
-textQuality.style.fontWeight = "bold";
-textQuality.style.fontFamily = "Arial";
-textQuality.style.color = "white";
-textQuality.style.float = "left";
-textQuality.style.display = "flex";
-textQuality.style.justifyContent = "center";
-textQuality.style.alignItems = "center";
-divQuality.appendChild(textQuality);
-
-let selectQuality = document.createElement('select');
-selectQuality.style.width = "40%";
-selectQuality.style.height = "80%";
-selectQuality.style.float = "right";
-selectQuality.style.marginTop = "1.5%";
-selectQuality.style.marginRight = "5%";
-divQuality.appendChild(selectQuality);
-
-let qualities = ["hd1080", "hd720", "large", "medium", "small", "tiny", "auto"];
-let qualityNames = ["1080p", "720p", "480p", "360p", "240p", "144p", "Auto"];
-for (let i = 0; i < qualities.length; i++) {
-    let optionQuality = document.createElement('option');
-    optionQuality.innerText = qualityNames[i];
-    selectQuality.appendChild(optionQuality);
-}
-
-selectQuality.value = "Auto";
-
-selectQuality.addEventListener('change', function(event) {
-    let indexQuality = qualityNames.indexOf(this.value);
-    console.log('You selected: ', qualities[indexQuality]);
-    event.target.player.setPlaybackQuality("small");
-    console.log(player.getPlaybackQuality());
-});
-
-
-
-
-// Speed section
-let divSpeed = document.createElement('div');
-divSpeed.style.width = "100%";
-divSpeed.style.height = "30px";
-divSetting.appendChild(divSpeed);
-
-let textSpeed = document.createElement('div');
-textSpeed.style.width = "50%";
-textSpeed.style.height = "100%";
-textSpeed.innerHTML = "Speed"
-textSpeed.style.fontWeight = "bold";
-textSpeed.style.fontFamily = "Arial";
-textSpeed.style.color = "white";
-textSpeed.style.float = "left";
-textSpeed.style.display = "flex";
-textSpeed.style.justifyContent = "center";
-textSpeed.style.alignItems = "center";
-divSpeed.appendChild(textSpeed);
-
-let selectSpeed = document.createElement('select');
-selectSpeed.style.width = "40%";
-selectSpeed.style.height = "80%";
-selectSpeed.style.float = "right";
-selectSpeed.style.marginTop = "1.5%";
-selectSpeed.style.marginRight = "5%";
-divSpeed.appendChild(selectSpeed);
-
-let speeds = [0.25, 0.5, 0.75, 1, 1.25, 1.5, 2];
-for (let i = 0; i < speeds.length; i++) {
-    let option = document.createElement('option');
-    option.innerText = speeds[i];
-    selectSpeed.appendChild(option);
-}
-
-selectSpeed.value = 1;
-
-selectSpeed.addEventListener('change', function() {
-    console.log('You selected: ', this.value);
-    player.setPlaybackRate(this.value);
-    console.log(player.getPlaybackRate())
-});
 
 
 
@@ -249,6 +120,7 @@ selectSpeed.addEventListener('change', function() {
 
 
 // Volume handle
+var mute = false;
 let volumeButton = document.createElement('input');
 volumeButton.style.width = "10%";
 volumeButton.style.height = "100%";
@@ -258,8 +130,32 @@ volumeButton.src = "volume.png";
 volumeButton.onclick = function () {
     console.log("Volume button");
     volumeButton.blur();
+
+    if (mute == false) {
+        player.setVolume(0);
+        volumeButton.src = "mute.png";
+        mute = true;
+    } else {
+        player.setVolume(50);
+        volumeButton.src = "volume.png";
+        mute = false;
+    }
 }
 
+let volumeProgressBar = document.createElement('progress');
+volumeProgressBar.style.width = "10%";
+volumeProgressBar.style.height = "100%";
+volumeProgressBar.style.float = "right";
+volumeProgressBar.value = "0.5";
+volumeProgressBar.max = "1";
+
+// Click on progress bar
+volumeProgressBar.addEventListener('click', function (event) {
+    let x = event.pageX - this.offsetLeft; // or e.offsetX (less support, though)
+    let clickedValue = x * this.max / this.offsetWidth;
+    volumeProgressBar.value = clickedValue.toString();
+    player.setVolume(clickedValue * 100)
+});
 
 
 
@@ -342,7 +238,6 @@ document.onfullscreenchange = function ( event ) {
 
 divActivity.appendChild(divChangeUrl);
 divActivity.appendChild(divPlayer);
-divActivity.appendChild(divSetting);
 
 divPlayer.appendChild(divVideo);
 divPlayer.appendChild(divProgressBar);
@@ -356,8 +251,8 @@ divProgressBar.appendChild(progressBar);
 divControls.appendChild(playButton);
 divControls.appendChild(timeDisplay);
 divControls.appendChild(fullscreenButton);
+divControls.appendChild(volumeProgressBar);
 divControls.appendChild(volumeButton);
-divControls.appendChild(settingsButton);
 
 
 
@@ -407,7 +302,7 @@ setInterval(function() {
         progressBar.value = time / timeTotal;
     
         // Update time display
-        timeDisplay.innerHTML = changeFormatTime(time) + "/" + changeFormatTime(timeTotal);   
+        timeDisplay.innerHTML = changeFormatTime(time) + " / " + changeFormatTime(timeTotal);   
         
         // console.log(player.getAvailableQualityLevels())
     }
